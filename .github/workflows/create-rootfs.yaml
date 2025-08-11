@@ -1,0 +1,29 @@
+name: Create Alpine rootfs images
+
+on:
+  push:
+    branches:
+      - senpai
+  workflow_dispatch:
+
+jobs:
+  create-rootfs:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        architecture: [armv7, armhf]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Create rootfs
+        run: |
+          echo "Creating rootfs for architecture: ${{ matrix.architecture }}"
+          sudo ./create_minimal_alpine_image.sh ${{ matrix.architecture }}
+          echo "Rootfs created for architecture: ${{ matrix.architecture }}"
+
+      - name: Upload rootfs disk image
+        uses: actions/upload-artifact@v4
+        with:
+          name: alpine-rootfs-${{ matrix.architecture }}
+          path: ./alpine.ext4
