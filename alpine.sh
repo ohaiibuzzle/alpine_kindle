@@ -5,10 +5,10 @@ if [ "$(mount | grep /tmp/alpine)" ] ; then
 	ALREADYMOUNTED="yes"
 	echo "ATTENTION! Alpine's rootfs is already mounted, thus you will be just dropped into it."
 	echo "BE CAREFUL to leave this shell first, as there will be no umount either (To not disturb the other session)."
-   else
+   else	
 	echo "Mounting Alpine rootfs"
 	mkdir -p /tmp/alpine
-	mount -o loop,noatime -t ext4 /mnt/base-us/alpine.ext4 /tmp/alpine
+	mount -o loop,noatime -t ext4 /mnt/base-us/alpine/alpine.ext4 /tmp/alpine
 	mount -o bind /dev /tmp/alpine/dev
 	mount -o bind /dev/pts /tmp/alpine/dev/pts
 	mount -o bind /proc /tmp/alpine/proc
