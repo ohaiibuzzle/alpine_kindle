@@ -20,6 +20,7 @@ jobs:
 
       - name: Create rootfs
         run: |
+          DEBIAN_FRONTEND=noninteractive sudo apt update && sudo apt install -y qemu-user-static
           echo "Creating rootfs for architecture: ${{ matrix.architecture }}"
           sudo ./create_minimal_alpine_image.sh ${{ matrix.architecture }}
           echo "Rootfs created for architecture: ${{ matrix.architecture }}"

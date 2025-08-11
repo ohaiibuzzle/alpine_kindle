@@ -40,6 +40,22 @@ tar -xzvf minirootfs.tar.gz -C "$MOUNT_POINT"
 echo "kindle" > "$MOUNT_POINT/etc/hostname"
 echo "nameserver 8.8.8.8" > "$MOUNT_POINT/etc/resolv.conf"
 
+# check if the env var RUN_CUSTOMIZE exists
+if [ -n "$RUN_CUSTOMIZE" ]; then
+  # Copy the customize script
+  cp ./customize.sh "$MOUNT_POINT/root/customize.sh"
+  chmod +x "$MOUNT_POINT/root/customize.sh"
+
+  # Copy qemu-[arch] binaries
+  cp $(which qemu-arm-static) "$MOUNT_POINT/usr/bin/"
+
+  # Run the customize script
+  chroot "$MOUNT_POINT" /usr/bin/qemu-arm-static /bin/sh /root/customize.sh
+
+  rm /root/customize.sh
+  rm /usr/bin/qemu-arm-static
+fi
+
 # Unmount the image
 sync
 umount "$MOUNT_POINT"
