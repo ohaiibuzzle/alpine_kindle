@@ -26,4 +26,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: alpine-rootfs-${{ matrix.architecture }}
-          path: ./alpine.ext4
+          path: |
+            alpine.ext4
+            alpine.sh
