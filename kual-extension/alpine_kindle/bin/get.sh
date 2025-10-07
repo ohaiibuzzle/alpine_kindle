@@ -4,6 +4,8 @@ MACHINE_ARCH=$(uname -m)
 
 if [ "$MACHINE_ARCH" = "armv7l" ]; then
     IMAGE_ARCH="armhf"
+else
+    IMAGE_ARCH=$MACHINE_ARCH
 fi
 
 if [ -d /mnt/base-us/alpine ]; then

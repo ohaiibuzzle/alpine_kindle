@@ -39,6 +39,7 @@ tar -xzvf minirootfs.tar.gz -C "$MOUNT_POINT"
 # Preconfig the image
 echo "kindle" > "$MOUNT_POINT/etc/hostname"
 echo "nameserver 8.8.8.8" > "$MOUNT_POINT/etc/resolv.conf"
+mkdir ${MOUNT_POINT}/run/dbus
 
 # check if the env var RUN_CUSTOMIZE exists
 if [ -n "$RUN_CUSTOMIZE" ]; then
@@ -55,6 +56,10 @@ if [ -n "$RUN_CUSTOMIZE" ]; then
   rm /root/customize.sh
   rm /usr/bin/qemu-arm-static
 fi
+
+# Copy the gui script
+cp ./addons/gui.sh "$MOUNT_POINT/usr/local/bin/gui"
+chmod +x "$MOUNT_POINT/usr/local/bin/gui"
 
 # Unmount the image
 sync
