@@ -14,6 +14,7 @@ jobs:
     strategy:
       matrix:
         architecture: [armv7, armhf]
+        customized: [false, true]
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -22,13 +23,26 @@ jobs:
         run: |
           DEBIAN_FRONTEND=noninteractive sudo apt update && sudo apt install -y qemu-user-static
           echo "Creating rootfs for architecture: ${{ matrix.architecture }}"
-          sudo ./create_minimal_alpine_image.sh ${{ matrix.architecture }}
-          echo "Rootfs created for architecture: ${{ matrix.architecture }}"
+
+          if [ "${{ matrix.customized }}" = "true" ]; then
+            export RUN_CUSTOMIZE="true"
+          fi
+
+          sudo -E ./create_minimal_alpine_image.sh ${{ matrix.architecture }}
+
+      - name: Set artifact name
+        id: artifact_name
+        run: |
+          name="alpine-rootfs-${{ matrix.architecture }}"
+          if [ "${{ matrix.customized }}" = "true" ]; then
+            name="${name}-customized"
+          fi
+          echo "name=$name" >> $GITHUB_OUTPUT
 
       - name: Upload rootfs disk image
         uses: actions/upload-artifact@v4
         with:
-          name: alpine-rootfs-${{ matrix.architecture }}
+          name: ${{ steps.artifact_name.outputs.name }}
           path: |
             alpine.ext4
             alpine.sh

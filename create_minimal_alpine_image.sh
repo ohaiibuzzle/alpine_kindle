@@ -43,6 +43,8 @@ mkdir ${MOUNT_POINT}/run/dbus
 
 # check if the env var RUN_CUSTOMIZE exists
 if [ -n "$RUN_CUSTOMIZE" ]; then
+  echo "Running customization script inside the image..."
+
   # Copy the customize script
   cp ./customize.sh "$MOUNT_POINT/root/customize.sh"
   chmod +x "$MOUNT_POINT/root/customize.sh"
@@ -65,3 +67,5 @@ chmod +x "$MOUNT_POINT/usr/local/bin/gui"
 sync
 umount "$MOUNT_POINT"
 rm -rf "$MOUNT_POINT"
+
+echo "Alpine Linux minimal image for $ARCH created at $IMAGE"
