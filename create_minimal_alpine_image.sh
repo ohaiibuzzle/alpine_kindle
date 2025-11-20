@@ -53,8 +53,8 @@ if [ -n "$RUN_CUSTOMIZE" ]; then
   # Run the customize script
   chroot "$MOUNT_POINT" /usr/bin/qemu-arm-static /bin/sh /root/customize.sh
 
-  rm /root/customize.sh
-  rm /usr/bin/qemu-arm-static
+  rm "$MOUNT_POINT/root/customize.sh"
+  rm "$MOUNT_POINT/usr/bin/qemu-arm-static"
 fi
 
 # Copy the gui script
