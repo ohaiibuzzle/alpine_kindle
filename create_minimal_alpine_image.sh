@@ -6,10 +6,17 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
-REPO="http://dl-cdn.alpinelinux.org/alpine"
 MOUNT_POINT="/mnt/alpine"
 IMAGE="./alpine.ext4"
 IMAGESIZE=2048 # Megabytes
+SOURCE_DOCKER="debian:stable-slim"
+
+DOCKER_ARCH_MAP=(
+  "x86_64=linux/amd64"
+  "aarch64=linux/arm/v8"
+  "armv7l=linux/arm/v7"
+  "armhf=linux/arm/v7"
+)
 
 if [ -n "$1" ]; then
   ARCH="$1"
@@ -19,10 +26,8 @@ else
   exit 1
 fi
 
-# Grab the prebuilt minirootfs
-wget "$REPO/latest-stable/releases/$ARCH/latest-releases.yaml"
-MINIROOTFS_FILE=$(grep "file: alpine-minirootfs-.*-$ARCH.tar.gz" latest-releases.yaml | awk '{print $2}')
-wget "$REPO/latest-stable/releases/$ARCH/$MINIROOTFS_FILE" -O minirootfs.tar.gz
+# Grab the docker image to use as rootfs
+docker save "$SOURCE_DOCKER" --platform "${DOCKER_ARCH_MAP[$ARCH]}"  | tar -xO --strip-components=5 ./layer.tar > rootfs.tar.gz
 
 # Prepare the disk image
 dd if=/dev/zero of="$IMAGE" bs=1M count="$IMAGESIZE"
@@ -34,7 +39,7 @@ mkdir -p "$MOUNT_POINT"
 mount -o loop "$IMAGE" "$MOUNT_POINT"
 
 # Extract the minirootfs
-tar -xzvf minirootfs.tar.gz -C "$MOUNT_POINT"
+tar -xzvf rootfs.tar.gz -C "$MOUNT_POINT"
 
 # Preconfig the image
 echo "kindle" > "$MOUNT_POINT/etc/hostname"
@@ -68,4 +73,4 @@ sync
 umount "$MOUNT_POINT"
 rm -rf "$MOUNT_POINT"
 
-echo "Alpine Linux minimal image for $ARCH created at $IMAGE"
+echo "Linux minimal image for $ARCH created at $IMAGE"
